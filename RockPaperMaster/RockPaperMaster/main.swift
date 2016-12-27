@@ -1,10 +1,20 @@
+//
+//  main.swift
+//  RockPaperMaster
+//
+//  Created by Igor Kantor on 12/26/16.
+//  Copyright © 2016 Igor Kantor. All rights reserved.
+//
+
+import Foundation
+
 //: Playground - noun: a place where people can play
 
 import Cocoa
 
-let num_players = 10
+let num_players = 50
 
-let battle_length = 25
+let battle_length = 1000
 let log_game_result = false
 let log_battle_result = true
 
@@ -33,22 +43,6 @@ class BattleScorecard : NSObject {
         }
         
         return sortedPlayers
-// --
-// --       implement sort
-// --
-//        let sorted =  battleScores.sorted(by: { (bs1, bs2) -> Bool in
-//            return bs1.value.wins > bs2.value.wins
-//        })
-        
-//        let sortedPlayers: [Player] = []
-//        for bs in sorted {
-//            play
-//        }
-        
-        
-//        battleScores.keys.sorted(by:{ (p1, p2) -> Bool in
-//            battleScores[p1].value.wins > battleScores[p2].value.wins
-//        })
     }
     
     init(players:[Player]) {
@@ -64,7 +58,7 @@ class BattleScorecard : NSObject {
     }
     
     func recordTie(player1:Player, player2:Player){
-    
+        
     }
     
     override var description : String {
@@ -72,7 +66,7 @@ class BattleScorecard : NSObject {
         var result = ""
         
         for (i, p) in self.rankedPlayers.enumerated() {
-            result.append("\(i): \(p)\n")
+            result.append("\(i+1): \(p) \(self.battleScores[p]!.wins)-\(self.battleScores[p]!.losses)-\(self.battleScores[p]!.ties)\n")
         }
         
         return result
@@ -107,28 +101,6 @@ class Battle{
         if log_battle_result {
             print("\(self.scorecard)")
         }
-    }
-    
-    // each plays against the others
-    // rankings after battle
-}
-
-class Player : NSObject {
-    let name:String!
-    init(name:String) {
-        self.name = name
-    }
-    
-    func move(opponentMove:Move?) -> Move {
-//        if let move = opponentMove {
-//            return move
-//        }
-        
-        return Move.randomMove()
-    }
-    
-    override var description :  String{
-        return self.name
     }
 }
 
@@ -177,10 +149,10 @@ class Game {
             default: break
             }
             
-//            print("\(move1!) X \(move2!) = \(result)")
+            //            print("\(move1!) X \(move2!) = \(result)")
         }
         
-//        winner is higest score
+        //        winner is higest score
         if self.score.player2 > self.score.player1 {
             self.score.winner = self.player2
             self.score.loser = self.player1
@@ -188,7 +160,7 @@ class Game {
             self.score.winner = self.player1
             self.score.loser = self.player2
         }
-//
+        //
         if let winner = self.score.winner {
             let end = NSDate()
             let duration : Double = end.timeIntervalSince(start as Date)
@@ -223,14 +195,6 @@ enum ThrowResult {
     case Tie
 }
 
-// last move
-func get_player1_move() -> Move {
-    return Move.randomMove()
-}
-
-func get_player2_move() -> Move {
-    return .Rock
-}
 
 func get_throw_results(move1:Move, move2:Move) -> ThrowResult{
     if move1 == move2 {
@@ -286,10 +250,41 @@ func get_throw_results(move1:Move, move2:Move) -> ThrowResult{
     }
 }
 
+class Player : NSObject {
+    let name:String!
+    init(name:String) {
+        self.name = name
+    }
+    
+    func move(opponentMove:Move?) -> Move {
+        //        if let move = opponentMove {
+        //            return move
+        //        }
+        
+        return Move.randomMove()
+    }
+    
+    override var description :  String{
+        return self.name
+    }
+}
+
+class RotatingPlayer : Player {
+    
+    init() {
+        super.init(name: "Rotating Player")
+    }
+    
+    override func move(opponentMove: Move?) -> Move {
+        return Move.Dynomyte
+    }
+}
+
 var players : [Player] = []
 for i in 1...num_players {
     players.insert(Player(name:"Player \(i)"), at: 0)
 }
+players.insert(RotatingPlayer(), at: 0)
 //let battle = Battle(players: [player1, player2])
 let battle = Battle(players: players)
 battle.play()
